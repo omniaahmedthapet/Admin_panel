@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# ── API Proxy: يوجه كل طلبات /api للسيرفر الأصلي ──────────────────────────
+[[redirects]]
+  from = "/api/*"
+  to = "http://medicall2026.runasp.net/api/:splat"
+  status = 200
+  force = true
+
+# ── SPA Fallback: مهم جداً لـ React Router ───────────────────────────────
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
