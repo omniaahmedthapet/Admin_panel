@@ -7,6 +7,7 @@ import logoImg from '../assets/Vector.png';
 import { MdEmail, MdLock } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 
+/* ── Decorative floating blob ── */
 function Blob({ style }) {
   return (
     <div style={{
@@ -19,6 +20,36 @@ function Blob({ style }) {
   );
 }
 
+/* ── Small stat badge ── */
+function StatBadge({ icon, label, value, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay, type: 'spring', stiffness: 200 }}
+      style={{
+        position: 'absolute',
+        background: 'rgba(255,255,255,0.92)',
+        backdropFilter: 'blur(12px)',
+        borderRadius: '16px',
+        padding: '10px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        boxShadow: '0 8px 24px rgba(10,22,40,0.10)',
+        border: '1px solid rgba(255,255,255,0.8)',
+        ...style,
+      }}
+    >
+      <span style={{ fontSize: '22px' }}>{icon}</span>
+      <div>
+        <div style={{ fontSize: '10px', color: '#6B7FA3', fontWeight: '600', lineHeight: 1 }}>{label}</div>
+        <div style={{ fontSize: '14px', color: '#0A1628', fontWeight: '800', lineHeight: 1.4 }}>{value}</div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -26,8 +57,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    if (e) e.preventDefault();
+  // ─── Logic unchanged ───────────────────────
+  const handleLogin = async () => {
     setError("");
     setLoading(true);
     try {
@@ -55,6 +86,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+  // ──────────────────────────────────────────
 
   return (
     <div style={{
@@ -65,10 +97,12 @@ export default function Login() {
       overflow: 'hidden',
     }}>
 
+      {/* ── Background blobs ── */}
       <Blob style={{ width: 520, height: 520, background: 'rgba(26,110,255,0.09)', top: -180, right: -180 }} />
       <Blob style={{ width: 380, height: 380, background: 'rgba(0,201,167,0.08)', bottom: -100, left: -80 }} />
       <Blob style={{ width: 200, height: 200, background: 'rgba(201,168,76,0.06)', top: '40%', left: '5%' }} />
 
+      {/* ── Decorative grid dots ── */}
       <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', opacity: 0.04 }}>
         <defs>
           <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
@@ -78,6 +112,26 @@ export default function Login() {
         <rect width="100%" height="100%" fill="url(#dots)" />
       </svg>
 
+      {/* ── Left Branding Panel (desktop) ── */}
+      <motion.div
+        initial={{ opacity: 0, x: -40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '3rem',
+          position: 'relative',
+          display: 'none',
+        }}
+        className="login-brand-panel"
+      >
+      </motion.div>
+
+      {/* ── Login Card ── */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -97,6 +151,7 @@ export default function Login() {
         >
           <Card style={{ padding: '3rem 2.5rem', textAlign: 'center' }}>
 
+            {/* Top accent bar */}
             <div style={{
               position: 'absolute',
               top: 0, left: '20%', right: '20%',
@@ -105,6 +160,7 @@ export default function Login() {
               borderRadius: '0 0 4px 4px',
             }} />
 
+            {/* Logo */}
             <motion.div
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -119,6 +175,7 @@ export default function Login() {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
+                {/* Spinning ring */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
@@ -131,6 +188,7 @@ export default function Login() {
                     borderRightColor: 'rgba(0,201,167,0.3)',
                   }}
                 />
+                {/* Glow bg */}
                 <div style={{
                   position: 'absolute',
                   inset: '8px',
@@ -147,6 +205,7 @@ export default function Login() {
               </div>
             </motion.div>
 
+            {/* Heading */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -171,105 +230,100 @@ export default function Login() {
               </p>
             </motion.div>
 
-            {/* ✅ form لإصلاح تحذير الـ password field */}
-            <form onSubmit={handleLogin} autoComplete="on">
+            {/* Inputs */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Input
+                placeholder="ادخل بريدك الالكتروني"
+                icon={<MdEmail size={20} />}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <Input
-                  placeholder="ادخل بريدك الالكتروني"
-                  icon={<MdEmail size={20} />}
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <Input
+                placeholder="ادخل كلمة المرور"
+                type="password"
+                icon={<MdLock size={20} />}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.55 }}
-              >
-                <Input
-                  placeholder="ادخل كلمة المرور"
-                  type="password"
-                  autoComplete="current-password"
-                  icon={<MdLock size={20} />}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                />
-              </motion.div>
-
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    key="error"
-                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.97 }}
-                    transition={{ duration: 0.3 }}
-                    style={{
-                      color: '#FF4757',
-                      backgroundColor: 'rgba(255,71,87,0.08)',
-                      padding: '13px 16px',
-                      borderRadius: '14px',
-                      marginBottom: '1rem',
-                      border: '1px solid rgba(255,71,87,0.18)',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    <span style={{ fontSize: '16px' }}>⚠️</span>
-                    {error}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.65 }}
-                style={{ marginTop: '0.8rem' }}
-              >
-                <Button
-                  type="submit"
-                  onClick={handleLogin}
-                  disabled={loading || !email || !password}
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    color: '#FF4757',
+                    backgroundColor: 'rgba(255,71,87,0.08)',
+                    padding: '13px 16px',
+                    borderRadius: '14px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(255,71,87,0.18)',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                 >
-                  {loading ? (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
-                      <span style={{ display: 'flex', gap: '4px' }}>
-                        {[0, 1, 2].map(i => (
-                          <span key={i} style={{
-                            width: '6px', height: '6px',
-                            borderRadius: '50%',
-                            background: '#fff',
-                            display: 'inline-block',
-                            animation: `dot-pulse 1.2s ${i * 0.2}s ease-in-out infinite`,
-                          }} />
-                        ))}
-                      </span>
-                      جاري التحميل
-                    </span>
-                  ) : (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
-                      🔐 تسجيل الدخول
-                    </span>
-                  )}
-                </Button>
-              </motion.div>
+                  <span style={{ fontSize: '16px' }}>⚠️</span>
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            </form>
+            {/* Login Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 }}
+              style={{ marginTop: '0.8rem' }}
+            >
+              <Button
+                onClick={handleLogin}
+                disabled={loading || !email || !password}
+              >
+                {loading ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
+                    <span style={{ display: 'flex', gap: '4px' }}>
+                      {[0, 1, 2].map(i => (
+                        <span key={i} style={{
+                          width: '6px', height: '6px',
+                          borderRadius: '50%',
+                          background: '#fff',
+                          display: 'inline-block',
+                          animation: `dot-pulse 1.2s ${i * 0.2}s ease-in-out infinite`,
+                        }} />
+                      ))}
+                    </span>
+                    جاري التحميل
+                  </span>
+                ) : (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                    🔐 تسجيل الدخول
+                  </span>
+                )}
+              </Button>
+            </motion.div>
 
+            {/* Bottom badge */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
