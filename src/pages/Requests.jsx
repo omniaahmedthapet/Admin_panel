@@ -23,6 +23,243 @@ function getSpecialtyStyle(specialty = '') {
   return SPECIALTY_COLORS.default;
 }
 
+/* ══════════════════════════════════════════
+   🔔 BEAUTIFUL TOAST NOTIFICATION COMPONENT
+   ══════════════════════════════════════════ */
+function NotificationToast({ toast, onClose, onNavigate }) {
+  const [progress, setProgress] = useState(100);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    setProgress(100);
+
+    // شريط التقدم
+    intervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        if (prev <= 0) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prev - (100 / 50); // 5 ثواني = 50 خطوة × 100ms
+      });
+    }, 100);
+
+    return () => clearInterval(intervalRef.current);
+  }, [toast]);
+
+  if (!toast) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 120, scale: 0.85 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 120, scale: 0.85, transition: { duration: 0.25 } }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      onClick={() => {
+        if (toast.id) onNavigate(toast.id);
+        onClose();
+      }}
+      style={{
+        position: 'fixed',
+        top: '24px',
+        left: '24px',
+        zIndex: 99999,
+        cursor: 'pointer',
+        userSelect: 'none',
+        width: '340px',
+      }}
+    >
+      {/* الكارد الرئيسي */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0A1628 0%, #102040 100%)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        boxShadow: '0 24px 60px rgba(10,22,40,0.45), 0 0 0 1px rgba(26,110,255,0.25)',
+        position: 'relative',
+      }}>
+
+        {/* خلفية زخرفية */}
+        <div style={{
+          position: 'absolute',
+          top: -30, right: -30,
+          width: 120, height: 120,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(26,110,255,0.25) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: -20, left: 10,
+          width: 80, height: 80,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0,201,167,0.18) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* المحتوى */}
+        <div style={{
+          padding: '18px 20px 14px',
+          position: 'relative',
+          zIndex: 1,
+        }}>
+          {/* الهيدر */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '14px',
+            marginBottom: '10px',
+          }}>
+            {/* أيقونة الجرس مع نبضة */}
+            <motion.div
+              animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #1A6EFF, #00C9A7)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                boxShadow: '0 6px 20px rgba(26,110,255,0.4)',
+                fontSize: '20px',
+              }}
+            >
+              🔔
+            </motion.div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Badge */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                background: 'rgba(26,110,255,0.2)',
+                border: '1px solid rgba(26,110,255,0.35)',
+                borderRadius: '20px',
+                padding: '2px 10px',
+                marginBottom: '5px',
+              }}>
+                <span style={{
+                  width: '6px', height: '6px',
+                  borderRadius: '50%',
+                  background: '#00C9A7',
+                  boxShadow: '0 0 6px #00C9A7',
+                  display: 'inline-block',
+                }} />
+                <span style={{
+                  fontSize: '10px',
+                  color: '#A0C4FF',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  fontFamily: 'Tajawal, sans-serif',
+                }}>
+                  MediCall Admin
+                </span>
+              </div>
+
+              <div style={{
+                fontSize: '15px',
+                fontWeight: '800',
+                color: '#FFFFFF',
+                lineHeight: 1.3,
+                fontFamily: 'Tajawal, sans-serif',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}>
+                {toast.title}
+              </div>
+            </div>
+
+            {/* زرار الإغلاق */}
+            <motion.button
+              whileHover={{ scale: 1.15, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: 'none',
+                borderRadius: '8px',
+                width: '28px',
+                height: '28px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '14px',
+                flexShrink: 0,
+                transition: 'all 0.2s',
+              }}
+            >
+              ✕
+            </motion.button>
+          </div>
+
+          {/* النص */}
+          <p style={{
+            fontSize: '13px',
+            color: 'rgba(255,255,255,0.65)',
+            margin: '0 0 14px',
+            fontFamily: 'Tajawal, sans-serif',
+            lineHeight: 1.5,
+            paddingRight: '58px',
+          }}>
+            {toast.body}
+          </p>
+
+          {/* زرار المراجعة */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              background: 'linear-gradient(135deg, #1A6EFF, #0052CC)',
+              borderRadius: '12px',
+              padding: '10px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 14px rgba(26,110,255,0.35)',
+            }}
+          >
+            <span style={{
+              fontSize: '13px',
+              fontWeight: '700',
+              color: '#fff',
+              fontFamily: 'Tajawal, sans-serif',
+            }}>
+              مراجعة الطلب
+            </span>
+            <span style={{ fontSize: '16px' }}>←</span>
+          </motion.div>
+        </div>
+
+        {/* شريط التقدم */}
+        <div style={{
+          height: '3px',
+          background: 'rgba(255,255,255,0.08)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <motion.div
+            initial={{ width: '100%' }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.1, ease: 'linear' }}
+            style={{
+              height: '100%',
+              background: 'linear-gradient(90deg, #1A6EFF, #00C9A7)',
+              boxShadow: '0 0 8px rgba(26,110,255,0.6)',
+            }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ── Stats header bar ── */
 function StatsBar({ count, loading }) {
   return (
@@ -40,7 +277,6 @@ function StatsBar({ count, loading }) {
       {[
         { icon: '📋', label: 'إجمالي الطلبات', value: loading ? '—' : count, color: '#1A6EFF' },
         { icon: '⏳', label: 'قيد المراجعة',   value: loading ? '—' : count, color: '#C9A84C' },
-        
       ].map((s, i) => (
         <motion.div
           key={i}
@@ -72,19 +308,21 @@ function StatsBar({ count, loading }) {
   );
 }
 
+/* ══════════════════════════════════════════
+   MAIN REQUESTS COMPONENT
+   ══════════════════════════════════════════ */
 export default function Requests() {
   const navigate = useNavigate();
   const [allRequests, setAllRequests] = useState([]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
-  // ✅ ref لتخزين الـ unsubscribe function
   const unsubscribeRef = useRef(null);
+  const toastTimerRef = useRef(null);
 
   // ─── Fetch Requests ────────────────────────────────────
   const fetchRequests = async () => {
     try {
       const token = localStorage.getItem("token");
-      // ✅ لو مفيش token → مسجل خروج → وقف فوراً
       if (!token) return;
 
       const response = await fetch("/api/Admin/UnApprovedProviders", {
@@ -114,13 +352,34 @@ export default function Requests() {
     }
   };
 
+  // ─── إظهار الـ Toast ───────────────────────────────────
+  const showToast = (toastData) => {
+    // امسح الـ timer القديم لو موجود
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+
+    setToast(toastData);
+
+    // إخفاء بعد 5 ثواني
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+    }, 5000);
+  };
+
   // ─── Logout ────────────────────────────────────────────
   const handleLogout = async () => {
+    // إخفاء أي toast موجود فوراً
+    setToast(null);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+
+    // إلغاء الـ listener فوراً قبل أي حاجة تانية
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
     try {
-      // ✅ 1. إيقاف الإشعارات أولاً (foreground + SW + FCM token delete)
       await cleanupNotifications();
 
-      // ✅ 2. حذف الـ device token من الباك اند
       const userToken = localStorage.getItem("token");
       const deviceId = localStorage.getItem("medicall_browser_id");
       if (deviceId && userToken) {
@@ -135,7 +394,6 @@ export default function Requests() {
     } catch (e) {
       console.error("Error during logout cleanup:", e);
     } finally {
-      // ✅ 3. مسح كل البيانات المحلية
       localStorage.removeItem("token");
       localStorage.removeItem("fcmToken");
       localStorage.removeItem("medicall_browser_id");
@@ -143,70 +401,63 @@ export default function Requests() {
     }
   };
 
-  // ─── Setup Notifications ───────────────────────────────
+  // ─── إعداد الـ Notifications ───────────────────────────
   const setupNotifications = () => {
-    // ✅ إعداد الـ foreground listener
+    // Foreground listener (الصفحة مفتوحة)
     const unsubscribe = onMessageListener((payload) => {
-      // ✅ تحقق من الـ login قبل العرض
+      // تأكد إن المستخدم لسه logged in
       if (!localStorage.getItem("token")) return;
 
-      // عرض الـ toast
-      setToast({
+      showToast({
         type: 'info',
-        title: payload.notification?.title || "طلب جديد",
-        body: payload.notification?.body || "تم إضافة طلب جديد",
+        title: payload.notification?.title || "طلب تسجيل جديد",
+        body: payload.notification?.body || "تم إضافة طلب جديد، راجعه الآن",
         id: payload.data?.id
       });
 
-      // ✅ auto-refresh للقائمة فوراً
+      // ✅ ريلود الطلبات تلقائياً
       fetchRequests();
-
-      // إخفاء الـ toast بعد 5 ثواني
-      setTimeout(() => setToast(null), 5000);
     });
-
     unsubscribeRef.current = unsubscribe;
 
-    // ✅ استقبال رسائل الـ Service Worker (background notifications)
+    // Background/SW message listener
     const swMessageHandler = (event) => {
       if (event.data?.type === "NEW_REQUEST") {
-        // تحقق من الـ login
         if (!localStorage.getItem("token")) return;
-
         console.log("📩 SW Message: New request received");
+        // ✅ ريلود الطلبات تلقائياً من الـ SW
         fetchRequests();
       }
     };
 
-    navigator.serviceWorker.addEventListener("message", swMessageHandler);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener("message", swMessageHandler);
+    }
 
-    // نرجع دالة cleanup تشمل الـ SW listener كمان
     return () => {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }
-      navigator.serviceWorker.removeEventListener("message", swMessageHandler);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.removeEventListener("message", swMessageHandler);
+      }
     };
   };
 
   // ─── useEffect ─────────────────────────────────────────
   useEffect(() => {
     fetchRequests();
-
-    // ✅ requestPermission بيتحقق داخلياً من الـ login
     requestPermission();
-
-    // ✅ تسجيل الـ listeners والحصول على دالة الـ cleanup
     const cleanup = setupNotifications();
 
-    // ✅ Cleanup عند unmount الـ component
     return () => {
       cleanup();
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
 
-  // ─── الـ JSX (بدون أي تعديل) ──────────────────────────
+  // ─── JSX ───────────────────────────────────────────────
   return (
     <div style={{
       backgroundColor: 'transparent',
@@ -232,24 +483,17 @@ export default function Requests() {
         filter: 'blur(70px)', pointerEvents: 'none', zIndex: 0,
       }} />
 
-      {/* Toast */}
+      {/* ══ BEAUTIFUL TOAST NOTIFICATION ══ */}
       <AnimatePresence>
         {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: 40 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="notification-toast"
-            onClick={() => toast.id && navigate('/request-details', { state: { request: { id: toast.id } } })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '20px' }}>🔔</span>
-              <div>
-                <strong style={{ display: 'block', fontSize: '15px' }}>{toast.title}</strong>
-                <p style={{ margin: '3px 0 0', fontSize: '13px', opacity: 0.8 }}>{toast.body}</p>
-              </div>
-            </div>
-          </motion.div>
+          <NotificationToast
+            toast={toast}
+            onClose={() => {
+              setToast(null);
+              if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            }}
+            onNavigate={(id) => navigate('/request-details', { state: { request: { id } } })}
+          />
         )}
       </AnimatePresence>
 

@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app"; 
 import { getMessaging, getToken, onMessage, deleteToken } from "firebase/messaging";
 
 const firebaseConfig = {
@@ -113,6 +113,7 @@ export const requestPermission = async () => {
 
 // ─── استقبال الإشعارات والصفحة مفتوحة (Foreground) ────
 export const onMessageListener = (callback) => {
+  // إلغاء الـ listener القديم لو موجود
   if (messageUnsubscribe) {
     messageUnsubscribe();
     messageUnsubscribe = null;
@@ -125,6 +126,7 @@ export const onMessageListener = (callback) => {
   }
 
   const unsubscribe = onMessage(messaging, (payload) => {
+    // تأكد إن المستخدم لسه logged in وقت وصول الرسالة
     const currentToken = localStorage.getItem("token");
     if (!currentToken) {
       console.warn("⚠️ Message received but user is logged out. Ignoring.");
@@ -141,14 +143,14 @@ export const onMessageListener = (callback) => {
 // ─── إلغاء كل الإشعارات عند الـ Logout ────────────────
 export const cleanupNotifications = async () => {
   try {
-    // 1. إيقاف الـ foreground listener
+    // إلغاء الـ foreground listener
     if (messageUnsubscribe) {
       messageUnsubscribe();
       messageUnsubscribe = null;
       console.log("✅ Foreground message listener removed.");
     }
 
-    // 2. حذف الـ FCM token من Firebase
+    // حذف الـ FCM token من Firebase
     try {
       await deleteToken(messaging);
       console.log("✅ FCM token deleted from Firebase.");
@@ -156,7 +158,7 @@ export const cleanupNotifications = async () => {
       console.warn("⚠️ Could not delete FCM token:", e);
     }
 
-    // 3. إبلاغ الـ Service Worker بالـ logout
+    // إبلاغ الـ service worker بالـ logout عشان يوقف الـ background notifications
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: 'LOGOUT' });
     }
